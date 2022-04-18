@@ -1,6 +1,6 @@
 package server.org.oauth;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -8,15 +8,16 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.provider.client.ClientDetailsUserDetailsService;
 
+
 @Configuration
 @EnableWebSecurity
-
+@RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+    private final ClientDetailsServiceImpl clientDetailsService;
 
 
     @Bean
@@ -26,10 +27,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.inMemoryAuthentication()
-                .withUser("foo")
-                .password("bar")
-                .roles("USER");
+        auth.userDetailsService(clientDetailsUserDetailsService())
+            .passwordEncoder(noOpPasswordEncoder());
+        // todo :: Change To the BcryptEncoder
     }
 
     @Override
@@ -46,6 +46,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
+    }
+
+
+    @Bean
+    public ClientDetailsUserDetailsService clientDetailsUserDetailsService() {
+        return new ClientDetailsUserDetailsService(clientDetailsService);
     }
 
 }
