@@ -1,0 +1,15 @@
+
+example:
+  jwt-secret: "hello"
+
+
+server:
+  port: 9000
+
+
+logging:
+  level:
+    org:
+      springframework:
+        web: DEBUG
+        security: DEBUG
