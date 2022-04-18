@@ -3,10 +3,13 @@ package server.org.oauth;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
+
+import javax.sql.DataSource;
 
 @Configuration
 @EnableAuthorizationServer
@@ -14,16 +17,23 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Aut
 public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
 
     private final AuthenticationManager authenticationManager;
+    private final DataSource dataSource;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
+
+        /**
+         * inmemor
+         */
         clients.inMemory()
                 .withClient("foo")
                 .secret("bar")
-                .redirectUris("http://localhost:8080/test/auth")
-                .authorizedGrantTypes("authorization_code", "password", "client_credentials", "implicit", "refresh_token")
+                .authorizedGrantTypes("client_credentials")
                 .scopes("read", "write", "email", "profile")
                 .accessTokenValiditySeconds(30000);
+
+      //  clients.jdbc(dataSource).passwordEncoder(passwordEncoder);
 
     }
 
